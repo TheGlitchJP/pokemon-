@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>りきゃぷちゃ ポッケモン</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+            width: 300px;
+        }
+        .grid-container img {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.3s;
+        }
+        .grid-container img.selected {
+            border: 2px solid #007BFF;
+        }
+        .instructions {
+            margin-bottom: 10px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>ちょっとまって！あなた、本当に人間ですよね？</h1>
+    <p>あなたがロボットではないことを確認させてください。</p>
+    <img src="img/h.png">
+    <div class="grid-container" id="grid-container"></div>
+    <button onclick="checkAnswers()">確認</button>
+    <div class="result" id="result"></div>
+
+    <script>
+        // 画像データ
+        const images = [
+            { src: "img/1.jpg", label: "1" },
+            { src: "img/2.jpg", label: "2" },
+            { src: "img/3.jpg", label: "3" },
+            { src: "img/4.jpg", label: "4" },
+            { src: "img/5.jpg", label: "5" },
+            { src: "img/6.jpg", label: "6" }
+        ];
+
+        // グリッドサイズ
+        const gridSize = 9;
+
+        // ウインディを必ず含むようにする
+        const targetImage = images.find(img => img.label === "1");
+        const gridImages = [];
+
+        gridImages.push(targetImage);
+
+        // 残りのスロットをランダムに埋める
+        while (gridImages.length < gridSize) {
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+            gridImages.push(randomImage);
+        }
+
+        // グリッド画像をランダムにシャッフル
+        gridImages.sort(() => Math.random() - 0.5);
+
+        // グリッドを描画
+        const container = document.getElementById("grid-container");
+        gridImages.forEach((image, index) => {
+            const img = document.createElement("img");
+            img.src = image.src;
+            img.alt = image.label;
+            img.dataset.label = image.label;
+            img.addEventListener("click", () => toggleSelection(img));
+            container.appendChild(img);
+        });
+
+        function toggleSelection(img) {
+            img.classList.toggle("selected");
+        }
+
+        // 回答を確認する
+        function checkAnswers() {
+            const selectedImages = Array.from(document.querySelectorAll(".grid-container img.selected"));
+            const selectedLabels = selectedImages.map(img => img.dataset.label);
+
+            // ウインディのみを選んだ場合正解とする
+            const isCorrect = selectedLabels.every(label => label === "1") &&
+                              selectedLabels.length === gridImages.filter(img => img.label === "1").length;
+
+            const result = document.getElementById("result");
+            if (isCorrect) {
+                result.textContent = "認証成功";
+                result.style.color = "blue";
+            } else {
+                result.textContent = "認証失敗";
+                result.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
